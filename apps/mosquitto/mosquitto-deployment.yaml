@@ -20,7 +20,7 @@ spec:
       initContainers:
       - name: fix-permissions
         image: busybox
-        command: ["sh", "-c", "mkdir -p /mosquitto/data"]
+        command: ["sh", "-c", "mkdir -p /mosquitto/data /mosquitto/auth && [ -f /mosquitto/auth/mosquitto.passwd ] && chmod 600 /mosquitto/auth/mosquitto.passwd && chown 1883:1883 /mosquitto/auth/mosquitto.passwd || true"]
         securityContext:
           runAsUser: 0  # Run as root to modify permissions
         volumeMounts:
@@ -36,6 +36,8 @@ spec:
           mountPath: /mosquitto/data
         - name: mosquitto-config
           mountPath: /mosquitto/config
+        - name: mosquitto-passwords
+          mountPath: /mosquitto/auth 
       volumes:
       - name: mosquitto-storage
         persistentVolumeClaim:
@@ -43,3 +45,7 @@ spec:
       - name: mosquitto-config
         configMap:
           name: mosquitto-config
+      - name: mosquitto-passwords
+        hostPath:
+          path: /mnt/k8s/apps/mosquitto  # Point to Minikube-mounted path
+          type: Directory
