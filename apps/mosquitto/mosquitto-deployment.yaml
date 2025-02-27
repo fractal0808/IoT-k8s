@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      securityContext:
+        runAsUser: 1883  # Run as mosquitto user
+        runAsGroup: 1883 # Run as mosquitto group
+      initContainers:
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "mkdir -p /mosquitto/data"]
+        securityContext:
+          runAsUser: 0  # Run as root to modify permissions
+        volumeMounts:
+        - name: mosquitto-storage
+          mountPath: /mosquitto/data
+      containers:
+      - name: mosquitto
+        image: eclipse-mosquitto:2.0.18
+        ports:
+        - containerPort: 1883
+        volumeMounts:
+        - name: mosquitto-storage
+          mountPath: /mosquitto/data
+        - name: mosquitto-config
+          mountPath: /mosquitto/config
+      volumes:
+      - name: mosquitto-storage
+        persistentVolumeClaim:
+          claimName: mosquitto-pvc
+      - name: mosquitto-config
+        configMap:
+          name: mosquitto-config

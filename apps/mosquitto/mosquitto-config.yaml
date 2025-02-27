@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+data:
+  mosquitto.conf: |
+    # Mosquitto configuration
+    persistence true
+    persistence_location /mosquitto/data
+    log_dest stdout
+    allow_anonymous true
+    listener 1883
+
+    # Hardcoded credentials
+   # password ismama:$7$101$7cYVXDVU2/R7RiRG$qQgGXA0av5BeFxpUehfDlulOSrKshaf1MWN/eYqjtiNJAD+EVBrNwwSJ4WBD515DdZ/PjpU6cZisYlzssht6w==
