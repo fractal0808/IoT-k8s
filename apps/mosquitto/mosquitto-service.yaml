@@ -5,7 +5,7 @@ metadata:
   labels:
     app: mosquitto
 spec:
-  type: NodePort  # Expose the service externally
+  type: LoadBalancer  # Expose the service externally
   selector:
     app: mosquitto  # This must match the labels in your Mosquitto deployment
   ports:
