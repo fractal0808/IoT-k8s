@@ -1,0 +1,13 @@
+appName : "mosquitto"
+svcName : "mosquitto-service"
+cfgName : "mosquitto-config"
+service : 
+  # type : "LoadBalancer"
+  type : "ClusterIP"
+  # type : "NodePort"
+  ports:
+    port: 1883
+    # nodePort : 31883 
+image : 
+  name : "eclipse-mosquitto"
+  tag : "2.0.18" 

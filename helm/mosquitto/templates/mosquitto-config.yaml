@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Values.cfgName}}
+data:
+  mosquitto.conf: |
+    # Use the password file from ConfigMap
+    password_file /mosquitto/auth/mosquitto.passwd
+    allow_anonymous false
+    persistence false
+    log_dest stdout
+    listener 1883 0.0.0.0
+    #persistence_location /mosquitto/data

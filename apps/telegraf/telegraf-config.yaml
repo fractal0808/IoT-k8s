@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: telegraf-config
+data:
+  telegraf.conf: |
+    [agent]
+      interval = "10s"
+      flush_interval = "10s"
+      debug = true
+      quiet = false
+
+    [[inputs.mqtt_consumer]]
+      servers = ["tcp://192.168.1.148:1883"]  # Use the internal service name
+      topics = ["#"]  # Subscribe to the specific topic
+      username = "ismama"  # Add your Mosquitto username
+      password = "12345678"  # Add your Mosquitto password       
+      data_format = "json_v2"
+      [[inputs.mqtt_consumer.json_v2]]
+        measurement_name = "mqtt"  # Optional: Force measurement name
+        [[inputs.mqtt_consumer.json_v2.field]]
+          path = "sensor"  # Map the "sensor" field
+          type = "string"
+        [[inputs.mqtt_consumer.json_v2.field]]
+          path = "distance"  # Map the "distance" field
+          type = "int"  # Parse as integer (even if it's a string in JSON)
+        [[inputs.mqtt_consumer.json_v2.field]]
+          path = "unit"  # Map the "unit" field
+          type = "string"     
+    
+    [[outputs.file]]
+      files = ["/tmp/telegraf_debug.log"]  # Send errors to stderr
+      data_format = "json"     
+
+    [[outputs.influxdb_v2]]
+      urls = ["http://influxdb:8086"]
+      token = "mytoken"
+      organization = "myorg"
+      bucket = "mybucket"

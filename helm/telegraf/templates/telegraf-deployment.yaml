@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.appName}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.appName}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.appName}}
+    spec:
+      containers:
+      - name: {{.Values.appName}}
+        image: "{{.Values.image.name}}:{{.Values.image.tag}}"
+        env:
+        - name: MQTT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: telegraf-mosquitto-credentials
+              key: username
+        - name: MQTT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: telegraf-mosquitto-credentials
+              key: password
+        volumeMounts:
+        - name: {{.Values.cfgName}}
+          mountPath: /etc/telegraf
+      volumes:
+      - name: {{.Values.cfgName}}
+        configMap:
+          name: {{.Values.cfgName}}

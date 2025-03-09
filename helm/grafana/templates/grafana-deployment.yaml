@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  labels:
+    app: grafana
+    app-group: mosquitto-grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+        app-group: mosquitto-grafana
+    spec:
+      securityContext:
+        fsGroup: 472  # Ensure the volume is writable by Grafana's group
+      containers:
+        - name: {{ .Values.appName }}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 3000
+          securityContext:
+            runAsUser: 472  # Run Grafana as its expected user
+          volumeMounts:
+            - name: grafana-storage
+              # mountPath: /var/lib/grafana  # Path where Grafana stores data
+            # - name: grafana-storage
+              mountPath: /grafana/data
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secret
+                  key: admin-user           
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-secret
+                  key: admin-password
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: grafana-pvc

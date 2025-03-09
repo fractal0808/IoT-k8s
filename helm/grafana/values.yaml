@@ -1,0 +1,12 @@
+appName : grafana
+svcName : grafana-service
+
+service : 
+  type : ClusterIP    # type : LoadBalancer
+  ports:
+    port: 3000  # port: 80
+
+
+image : 
+  name : grafana/grafana
+  tag : latest

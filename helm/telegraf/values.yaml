@@ -1,0 +1,43 @@
+appName : telegraf
+svcName : telegraf-service
+cfgName : telegraf-config
+service : 
+  type : "ClusterIP"   # type : LoadBalancer
+  ports:
+    port: 3000  # port: 80
+image : 
+  name : telegraf
+  tag : latest
+
+agent:
+  interval: "10s"
+  flushInterval: "10s"
+  debug: true
+  quiet: false
+
+mqtt:
+  servers:
+    - "tcp://mosquitto-service:1883"
+  topics:
+    - "#"
+  dataFormat: "json_v2"
+  measurementName: "mqtt"
+  fields:
+    - path: "sensor"
+      type: "string"
+    - path: "distance"
+      type: "int"
+    - path: "unit"
+      type: "string"
+
+outputs:
+  file:
+    files:
+      - "/tmp/telegraf_debug.log"
+    dataFormat: "json"
+  influxdb:
+    urls:
+      - "http://influxdb:8086"
+    token: "mytoken"
+    organization: "myorg"
+    bucket: "mybucket"
